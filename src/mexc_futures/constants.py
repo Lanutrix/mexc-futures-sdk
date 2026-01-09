@@ -1,38 +1,23 @@
 """Constants for MEXC Futures SDK."""
 
-import random
 import re
+
+from fake_useragent import UserAgent
 
 API_BASE_URL = "https://futures.mexc.com/api/v1"
 
 WEBSOCKET_URL = "wss://contract.mexc.com/edge"
 
-# Static user-agent strings (avoids fake_useragent network warnings)
-_USER_AGENTS = [
-    # Chrome on Windows
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-    # Chrome on macOS
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-    # Edge on Windows
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
-    # Edge on macOS
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-]
+# Lazy-initialized fake-useragent instance
+_ua: UserAgent | None = None
 
 
-class _UserAgentProvider:
-    """Simple user-agent provider with random selection."""
-    
-    @property
-    def random(self) -> str:
-        """Get a random user-agent string."""
-        return random.choice(_USER_AGENTS)
-
-
-_ua = _UserAgentProvider()
+def get_random_user_agent() -> str:
+    """Get a random user-agent string (lazy initialization)."""
+    global _ua
+    if _ua is None:
+        _ua = UserAgent(browsers=["Chrome", "Edge"])
+    return _ua.random
 
 
 def _parse_ua_for_sec_ch(user_agent: str) -> tuple[str, str]:
@@ -93,9 +78,14 @@ class Endpoints:
     CONTRACT_DEPTH = "/contract/depth"
 
 
-def get_default_headers() -> dict[str, str]:
-    """Generate default browser headers with random user-agent and matching sec-ch-ua."""
-    user_agent = _ua.random
+def get_default_headers(user_agent: str | None = None) -> dict[str, str]:
+    """Generate default browser headers with user-agent and matching sec-ch-ua.
+
+    Args:
+        user_agent: Optional user-agent string. If not provided, generates a random one.
+    """
+    if user_agent is None:
+        user_agent = get_random_user_agent()
     sec_ch_ua, sec_ch_ua_platform = _parse_ua_for_sec_ch(user_agent)
 
     return {

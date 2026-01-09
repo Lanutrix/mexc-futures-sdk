@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-from .constants import Endpoints, get_default_headers
+from .constants import Endpoints, get_default_headers, get_random_user_agent
 from .exceptions import MexcValidationError, parse_httpx_error
 from .models import (
     AccountAssetResponse,
@@ -59,6 +59,7 @@ class MexcFuturesClient:
         self.config = config
         self.logger = get_logger("mexc_futures.client", config.log_level)
         self._client: httpx.AsyncClient | None = None
+        self._user_agent: str | None = None
 
     def _build_headers(self, include_auth: bool = True, request_body: Any = None) -> dict[str, str]:
         """Build request headers with optional authentication.
@@ -70,10 +71,9 @@ class MexcFuturesClient:
         Returns:
             Dict of HTTP headers
         """
-        headers = get_default_headers()
-
-        if self.config.user_agent:
-            headers["user-agent"] = self.config.user_agent
+        # Use session user-agent or config override
+        ua = self.config.user_agent or self._user_agent
+        headers = get_default_headers(ua)
 
         headers.update(self.config.custom_headers)
 
@@ -106,6 +106,10 @@ class MexcFuturesClient:
 
     async def __aenter__(self) -> MexcFuturesClient:
         """Enter async context manager."""
+        # Generate user-agent once per session
+        if self._user_agent is None and not self.config.user_agent:
+            self._user_agent = get_random_user_agent()
+            self.logger.debug(f"Generated user-agent: {self._user_agent}")
         await self._get_client()
         return self
 
@@ -443,6 +447,8 @@ class MexcFuturesClientSync:
         self._run(self._async_client.close())
 
     def __enter__(self) -> MexcFuturesClientSync:
+        # Generate user-agent once per session (via async client's __aenter__)
+        self._run(self._async_client.__aenter__())
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
