@@ -1,15 +1,38 @@
 """Constants for MEXC Futures SDK."""
 
+import random
 import re
-
-from fake_useragent import UserAgent
 
 API_BASE_URL = "https://futures.mexc.com/api/v1"
 
 WEBSOCKET_URL = "wss://contract.mexc.com/edge"
 
-# User agent generator
-_ua = UserAgent(browsers=["chrome", "edge"], os=["windows", "macos"])
+# Static user-agent strings (avoids fake_useragent network warnings)
+_USER_AGENTS = [
+    # Chrome on Windows
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    # Chrome on macOS
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    # Edge on Windows
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
+    # Edge on macOS
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+]
+
+
+class _UserAgentProvider:
+    """Simple user-agent provider with random selection."""
+    
+    @property
+    def random(self) -> str:
+        """Get a random user-agent string."""
+        return random.choice(_USER_AGENTS)
+
+
+_ua = _UserAgentProvider()
 
 
 def _parse_ua_for_sec_ch(user_agent: str) -> tuple[str, str]:

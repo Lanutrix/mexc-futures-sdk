@@ -12,24 +12,24 @@ async def main():
 
     async with MexcFuturesClient(config) as client:
         try:
-            print("🔄 Получаем тикер BTC_USDT...")
+            print("[...] Получаем тикер BTC_USDT...")
             ticker = await client.get_ticker("BTC_USDT")
 
             if ticker and ticker.data:
-                print(f"✅ Цена BTC: {ticker.data.lastPrice}")
+                print(f"[OK] Цена BTC: {ticker.data.lastPrice}")
             else:
-                print("⚠️ Данные тикера не получены")
+                print("[!] Данные тикера не получены")
 
             # Пример получения баланса (раскомментируйте, если токен валидный)
 
-            print("🔄 Получаем баланс...")
+            print("[...] Получаем баланс...")
             assets = await client.get_account_asset("USDT")
-            print(f"💰 Баланс: {assets.data}")
+            print(f"[$] Баланс: {assets.data}")
 
         except MexcAuthenticationError:
-            print("❌ Ошибка авторизации. Обновите WEB-токен.")
+            print("[X] Ошибка авторизации. Обновите WEB-токен.")
         except Exception as error:
-            print(f"❌ Произошла ошибка: {error}")
+            print(f"[X] Произошла ошибка: {error}")
 
 
 if __name__ == "__main__":
