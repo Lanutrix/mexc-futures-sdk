@@ -69,9 +69,43 @@ config = SDKConfig(
     auth_token="WEB...",           # Обязательно: токен авторизации
     base_url="https://futures.mexc.com/api/v1",  # Базовый URL
     timeout=30.0,                  # Таймаут запросов (секунды)
-    user_agent=None,               # Кастомный User-Agent
+    user_agent=None,               # Кастомный User-Agent (или авто)
     custom_headers={},             # Дополнительные заголовки
     log_level=logging.WARNING,     # Уровень логирования
+)
+```
+
+### User-Agent
+
+По умолчанию user-agent генерируется автоматически при входе в контекст `with` с помощью библиотеки [fake-useragent](https://pypi.org/project/fake-useragent/). Каждая сессия получает свой уникальный user-agent:
+
+```python
+import asyncio
+from mexc_futures import MexcFuturesClient, SDKConfig
+
+async def session(name: str):
+    config = SDKConfig(auth_token="WEB...")
+    async with MexcFuturesClient(config) as client:
+        print(f"{name}: {client._user_agent}")
+        # User-agent сохраняется для всех запросов внутри with
+
+# Параллельные сессии с разными user-agent
+async def main():
+    await asyncio.gather(
+        session("Session 1"),
+        session("Session 2"),
+        session("Session 3"),
+    )
+
+asyncio.run(main())
+```
+
+Для использования своего user-agent:
+
+```python
+config = SDKConfig(
+    auth_token="WEB...",
+    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/135.0.0.0"
 )
 ```
 
