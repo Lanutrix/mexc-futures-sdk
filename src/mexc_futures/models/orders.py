@@ -3,7 +3,7 @@
 from enum import IntEnum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class OrderSide(IntEnum):
@@ -165,12 +165,19 @@ class CancelOrderByExternalIdRequest(BaseModel):
     symbol: str
     externalOid: str
 
+    @field_validator("externalOid", mode="before")
+    @classmethod
+    def convert_to_str(cls, v: Any) -> str:
+        """Convert int to str for externalOid."""
+        return str(v)
+
 
 class CancelOrderByExternalIdData(BaseModel):
     """Data returned when cancelling by external ID."""
 
-    symbol: str
+    symbol: str | None = None
     externalOid: str
+    ordMsg: str | None = None
 
 
 class CancelOrderByExternalIdResponse(BaseModel):
