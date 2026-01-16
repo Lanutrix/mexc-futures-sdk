@@ -95,6 +95,7 @@ class MexcFuturesClient:
                 base_url=self.config.base_url,
                 timeout=self.config.timeout,
                 headers=self._build_headers(include_auth=False),
+                cookies=self.config.custom_cookies or None,
             )
         return self._client
 
@@ -142,6 +143,8 @@ class MexcFuturesClient:
             MexcFuturesError: On API errors
         """
         client = await self._get_client()
+        if self.config.custom_cookies:
+            client.cookies.update(self.config.custom_cookies)
         headers = self._build_headers(include_auth=include_auth, request_body=json_body)
 
         self.logger.debug(f"{method} {self.config.base_url}{endpoint}")
@@ -370,7 +373,12 @@ class MexcFuturesClient:
             Contract details
         """
         params = {"symbol": symbol} if symbol else None
-        data = await self._request("GET", Endpoints.CONTRACT_DETAIL, params=params, include_auth=False)
+        data = await self._request(
+            "GET",
+            Endpoints.CONTRACT_DETAIL,
+            params=params,
+            include_auth=False,
+        )
         return ContractDetailResponse.model_validate(data)
 
     async def get_contract_depth(

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mexc-futures"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python SDK for MEXC Futures API with async support"
 readme = "README.md"
 license = "MIT"

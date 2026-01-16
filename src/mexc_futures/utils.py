@@ -82,6 +82,9 @@ class SDKConfig:
     custom_headers: dict[str, str] = field(default_factory=dict)
     """Additional custom headers"""
 
+    custom_cookies: dict[str, str] = field(default_factory=dict)
+    """Additional cookies to send with each request"""
+
     log_level: int = logging.WARNING
     """Logging level (use logging.DEBUG, logging.INFO, etc.)"""
 

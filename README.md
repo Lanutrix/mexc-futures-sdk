@@ -71,9 +71,12 @@ config = SDKConfig(
     timeout=30.0,                  # Таймаут запросов (секунды)
     user_agent=None,               # Кастомный User-Agent (или авто)
     custom_headers={},             # Дополнительные заголовки
+    custom_cookies={},             # Дополнительные cookies
     log_level=logging.WARNING,     # Уровень логирования
 )
 ```
+
+`custom_cookies` можно использовать для передачи дополнительных браузерных cookies (например, локаль или другие параметры сессии). Они добавляются ко всем HTTP-запросам клиента.
 
 ### User-Agent
 
