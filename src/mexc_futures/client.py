@@ -410,6 +410,40 @@ class MexcFuturesClient:
         except Exception:
             return False
 
+    # ==================== USER INFO (WEB UCENTER) ====================
+
+    async def get_user_info(self) -> dict[str, Any]:
+        """Get important user parameters from MEXC web ucenter.
+
+        This calls ``https://www.mexc.com/ucenter/api/user_info`` and extracts
+        the most important fields: ``email``, ``digitalId`` and ``kycMode``.
+
+        Notes:
+            - Authentication for this endpoint is handled via browser-style
+              headers/cookies, not futures API auth.
+            - Configure the required headers (e.g. ``ucenter-token``) and
+              cookies (e.g. ``uc_token``, ``u_id``) via
+              ``SDKConfig.custom_headers`` and ``SDKConfig.custom_cookies``.
+
+        Returns:
+            Dict with keys: ``email``, ``digitalId``, ``kycMode`` (values may be None
+            if the fields are missing in the response).
+        """
+        data = await self._request(
+            "POST",
+            "https://www.mexc.com/ucenter/api/user_info",
+            include_auth=False,
+        )
+
+        # Some responses wrap user data in a "data" field, others may be flat.
+        user = data.get("data", data) if isinstance(data, dict) else {}
+
+        return {
+            "email": user.get("email"),
+            "digitalId": user.get("digitalId"),
+            "kycMode": user.get("kycMode"),
+        }
+
 
 class MexcFuturesClientSync:
     """Synchronous wrapper for MexcFuturesClient.
@@ -519,4 +553,8 @@ class MexcFuturesClientSync:
 
     def test_connection(self) -> bool:
         return self._run(self._async_client.test_connection())
+
+    # User info (web ucenter)
+    def get_user_info(self) -> dict[str, Any]:
+        return self._run(self._async_client.get_user_info())
 
