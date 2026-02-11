@@ -96,6 +96,7 @@ class MexcFuturesClient:
                 timeout=self.config.timeout,
                 headers=self._build_headers(include_auth=False),
                 cookies=self.config.custom_cookies or None,
+                proxy=self.config.proxy,
             )
         return self._client
 

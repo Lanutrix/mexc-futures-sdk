@@ -154,7 +154,10 @@ class MexcFuturesWebSocket:
         self.logger.info("Connecting to MEXC Futures WebSocket...")
 
         try:
-            self._ws = await websockets.connect(WEBSOCKET_URL)
+            self._ws = await websockets.connect(
+                WEBSOCKET_URL,
+                proxy=self.config.proxy,
+            )
             self._is_connected = True
             self.logger.info("WebSocket connected")
 

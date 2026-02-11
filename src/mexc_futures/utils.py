@@ -88,6 +88,9 @@ class SDKConfig:
     log_level: int = logging.WARNING
     """Logging level (use logging.DEBUG, logging.INFO, etc.)"""
 
+    proxy: str | None = None
+    """Proxy URL (e.g. socks5://user:pass@host:port)"""
+
 
 @dataclass
 class WebSocketConfig:
@@ -110,4 +113,7 @@ class WebSocketConfig:
 
     log_level: int = logging.WARNING
     """Logging level"""
+
+    proxy: str | None = None
+    """Proxy URL (e.g. socks5://user:pass@host:port)"""
 
