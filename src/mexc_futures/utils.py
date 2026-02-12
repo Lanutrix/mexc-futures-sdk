@@ -7,6 +7,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
+from .constants import get_random_user_agent
+
 
 def get_logger(name: str = "mexc_futures", level: int = logging.WARNING) -> logging.Logger:
     """Get or create a logger with the specified name and level.
@@ -77,7 +79,7 @@ class SDKConfig:
     """Request timeout in seconds"""
 
     user_agent: str | None = None
-    """Custom User-Agent header"""
+    """User-Agent header. Auto-generated via fake-useragent if not provided."""
 
     custom_headers: dict[str, str] = field(default_factory=dict)
     """Additional custom headers"""
@@ -90,6 +92,10 @@ class SDKConfig:
 
     proxy: str | None = None
     """Proxy URL (e.g. socks5://user:pass@host:port)"""
+
+    def __post_init__(self) -> None:
+        if self.user_agent is None:
+            self.user_agent = get_random_user_agent()
 
 
 @dataclass
