@@ -30,18 +30,20 @@ Example (sync):
 
 __version__ = "0.1.0"
 
-# Main clients
 from .client import MexcFuturesClient, MexcFuturesClientSync
-from .websocket import MexcFuturesWebSocket, FilterType
-
-# Configuration
-from .utils import SDKConfig, WebSocketConfig, get_logger
-
-# Exceptions
+from .constants import (
+    API_BASE_URL,
+    DEFAULT_HEADERS,
+    KLINE_INTERVALS,
+    WEBSOCKET_URL,
+    Endpoints,
+    WsChannels,
+    get_default_headers,
+)
 from .exceptions import (
-    MexcFuturesError,
     MexcApiError,
     MexcAuthenticationError,
+    MexcFuturesError,
     MexcNetworkError,
     MexcRateLimitError,
     MexcSignatureError,
@@ -50,69 +52,51 @@ from .exceptions import (
     format_error_for_logging,
     parse_httpx_error,
 )
-
-# Constants
-from .constants import (
-    API_BASE_URL,
-    WEBSOCKET_URL,
-    DEFAULT_HEADERS,
-    get_default_headers,
-    Endpoints,
-    WsChannels,
-    KLINE_INTERVALS,
-)
-
-# Models - Orders
 from .models import (
-    OrderSide,
-    OrderType,
-    OpenType,
-    OrderCategory,
-    OrderState,
-    OrderHistoryParams,
-    Order,
-    OrderHistoryResponse,
-    OrderDealsParams,
-    OrderDeal,
-    OrderDealsResponse,
-    CancelOrderResult,
-    CancelOrderResponse,
-    CancelOrderByExternalIdRequest,
-    CancelOrderByExternalIdResponse,
-    CancelAllOrdersRequest,
-    CancelAllOrdersResponse,
-    SubmitOrderRequest,
-    SubmitOrderResponse,
-    GetOrderData,
-    GetOrderResponse,
-)
-
-# Models - Account
-from .models import (
-    RiskLimit,
-    FeeRate,
-    AccountResponse,
     AccountAsset,
     AccountAssetResponse,
-    PositionType,
-    PositionState,
-    Position,
-    OpenPositionsResponse,
-    PositionHistoryParams,
-    PositionHistoryResponse,
-)
-
-# Models - Market
-from .models import (
-    RiseFallRates,
-    TickerData,
-    TickerResponse,
+    AccountResponse,
+    CancelAllOrdersRequest,
+    CancelAllOrdersResponse,
+    CancelOrderByExternalIdRequest,
+    CancelOrderByExternalIdResponse,
+    CancelOrderResponse,
+    CancelOrderResult,
+    ContractDepthData,
+    ContractDepthResponse,
     ContractDetail,
     ContractDetailResponse,
     DepthEntry,
-    ContractDepthData,
-    ContractDepthResponse,
+    FeeRate,
+    GetOrderData,
+    GetOrderResponse,
+    OpenPositionsResponse,
+    OpenType,
+    Order,
+    OrderCategory,
+    OrderDeal,
+    OrderDealsParams,
+    OrderDealsResponse,
+    OrderHistoryParams,
+    OrderHistoryResponse,
+    OrderSide,
+    OrderState,
+    OrderType,
+    Position,
+    PositionHistoryParams,
+    PositionHistoryResponse,
+    PositionState,
+    PositionType,
+    RiseFallRates,
+    RiskLimit,
+    SubmitOrderRequest,
+    SubmitOrderResponse,
+    TickerData,
+    TickerResponse,
 )
+from .session import SessionManager
+from .utils import SDKConfig, WebSocketConfig, get_logger
+from .websocket import FilterType, MexcFuturesWebSocket
 
 __all__ = [
     # Version
@@ -122,6 +106,8 @@ __all__ = [
     "MexcFuturesClientSync",
     "MexcFuturesWebSocket",
     "FilterType",
+    # Session
+    "SessionManager",
     # Configuration
     "SDKConfig",
     "WebSocketConfig",

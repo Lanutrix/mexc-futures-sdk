@@ -93,6 +93,36 @@ class SDKConfig:
     proxy: str | None = None
     """Proxy URL (e.g. socks5://user:pass@host:port)"""
 
+    http2: bool = True
+    """Enable HTTP/2 multiplexing (requires h2 package)."""
+
+    connect_timeout: float = 10.0
+    """TCP + TLS handshake timeout (seconds)."""
+
+    read_timeout: float = 15.0
+    """Response read timeout (seconds)."""
+
+    write_timeout: float = 15.0
+    """Request write timeout (seconds)."""
+
+    pool_timeout: float = 5.0
+    """Timeout waiting for a connection from the pool (seconds)."""
+
+    max_connections: int = 100
+    """Maximum number of connections in the pool."""
+
+    max_keepalive_connections: int = 20
+    """Maximum number of idle keep-alive connections."""
+
+    keepalive_expiry: float = 90.0
+    """Idle connection lifetime in seconds (session TTL)."""
+
+    ping_interval: float = 80.0
+    """Seconds between keep-alive pings (should be < keepalive_expiry)."""
+
+    max_idle_pings: int = 6
+    """Close session after this many consecutive pings without user activity."""
+
     def __post_init__(self) -> None:
         if self.user_agent is None:
             self.user_agent = get_random_user_agent()

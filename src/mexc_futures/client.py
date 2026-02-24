@@ -33,6 +33,7 @@ from .models import (
     SubmitOrderResponse,
     TickerResponse,
 )
+from .session import SessionManager
 from .utils import SDKConfig, get_logger, mexc_crypto
 
 
@@ -58,7 +59,7 @@ class MexcFuturesClient:
         """
         self.config = config
         self.logger = get_logger("mexc_futures.client", config.log_level)
-        self._client: httpx.AsyncClient | None = None
+        self._session = SessionManager(config)
 
     def _build_headers(self, include_auth: bool = True, request_body: Any = None) -> dict[str, str]:
         """Build request headers with optional authentication.
@@ -86,26 +87,16 @@ class MexcFuturesClient:
         return headers
 
     async def _get_client(self) -> httpx.AsyncClient:
-        """Get or create the HTTP client."""
-        if self._client is None or self._client.is_closed:
-            self._client = httpx.AsyncClient(
-                base_url=self.config.base_url,
-                timeout=self.config.timeout,
-                headers=self._build_headers(include_auth=False),
-                cookies=self.config.custom_cookies or None,
-                proxy=self.config.proxy,
-            )
-        return self._client
+        """Get or create the HTTP client via SessionManager."""
+        return await self._session.get_client()
 
     async def close(self) -> None:
-        """Close the HTTP client."""
-        if self._client and not self._client.is_closed:
-            await self._client.aclose()
-            self._client = None
+        """Close the HTTP client and stop keep-alive."""
+        await self._session.close()
 
     async def __aenter__(self) -> MexcFuturesClient:
         """Enter async context manager."""
-        await self._get_client()
+        await self._session.get_client()
         return self
 
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -156,6 +147,7 @@ class MexcFuturesClient:
             response.raise_for_status()
             data = response.json()
             self.logger.debug(f"Response: {response.status_code}")
+            self._session.notify_activity()
             return data
 
         except httpx.HTTPStatusError as e:
